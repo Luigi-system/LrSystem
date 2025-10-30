@@ -1,0 +1,178 @@
+{
+  "DB": [],
+  "DATABASE_STRUCTURE": {
+    "tables": {
+      "Empresa": {
+        "name": "Empresa",
+        "columns": [
+          "id",
+          "nombre",
+          "ruc",
+          "distrito",
+          "direccion",
+          "estado",
+          "created_at"
+        ],
+        "depends_on": []
+      },
+      "Planta": {
+        "name": "Planta",
+        "columns": [
+          "id",
+          "nombre",
+          "direccion",
+          "id_empresa",
+          "estado",
+          "created_at"
+        ],
+        "depends_on": ["id_empresa"]
+      },
+      "Maquinas": {
+        "name": "Maquinas",
+        "columns": [
+          "id",
+          "marca",
+          "modelo",
+          "serie",
+          "linea",
+          "detalles",
+          "id_planta",
+          "id_empresa",
+          "estado",
+          "created_at"
+        ],
+        "depends_on": ["id_planta", "id_empresa"]
+      },
+      "Encargado": {
+        "name": "Encargado",
+        "columns": [
+          "id",
+          "nombre",
+          "apellido",
+          "dni",
+          "email",
+          "celular",
+          "cargo",
+          "id_planta",
+          "nacimiento",
+          "created_at"
+        ],
+        "depends_on": ["id_planta"]
+      },
+      "Usuarios": {
+        "name": "Usuarios",
+        "columns": [
+          "id",
+          "usuario",
+          "nombres",
+          "dni",
+          "email",
+          "celular",
+          "rol",
+          "estado",
+          "created_at"
+        ],
+        "depends_on": []
+      },
+      "Reporte_Servicio": {
+        "name": "Reporte_Servicio",
+        "columns": [
+          "id",
+          "codigo_reporte",
+          "fecha",
+          "id_usuario",
+          "id_empresa",
+          "id_encargado",
+          "serie_maquina",
+          "marca_maquina",
+          "modelo_maquina",
+          "linea_maquina",
+          "operativo",
+          "inoperativo",
+          "estado",
+          "created_at"
+        ],
+        "depends_on": ["id_usuario", "id_empresa", "id_encargado"]
+      },
+      "Roles": {
+        "name": "Roles",
+        "columns": ["id", "nombre", "created_at"],
+        "depends_on": []
+      },
+      "Training_Data": {
+        "name": "training_data",
+        "columns": [
+          "id",
+          "query",
+          "response_status",
+          "response_message",
+          "response_data",
+          "is_valuable",
+          "user_feedback",
+          "detected_entity",
+          "execution_time_ms",
+          "error_type",
+          "suggestions",
+          "created_at",
+          "updated_at"
+        ],
+        "depends_on": []
+      },
+      "Query_Stats": {
+        "name": "query_stats",
+        "columns": [
+          "id",
+          "query_text",
+          "table_name",
+          "entity_type",
+          "success_count",
+          "error_count",
+          "avg_execution_time_ms",
+          "last_executed_at",
+          "created_at"
+        ],
+        "depends_on": []
+      },
+      "parent_table_map": {
+        "id_empresa": "Empresa",
+        "id_planta": "Planta",
+        "id_usuario": "Usuarios",
+        "id_encargado": "Encargado",
+        "id": "id"
+      }
+    },
+    "entity_mappings": {
+      "clientes": "Empresa",
+      "empresas": "Empresa",
+      "empresa": "Empresa",
+      "plantas": "Planta",
+      "planta": "Planta",
+      "maquinas": "Maquinas",
+      "máquinas": "Maquinas",
+      "maquina": "Maquinas",
+      "encargados": "Encargado",
+      "encargado": "Encargado",
+      "usuarios": "Usuarios",
+      "usuario": "Usuarios",
+      "reportes": "Reporte_Servicio",
+      "reporte": "Reporte_Servicio",
+      "roles": "Roles",
+      "rol": "Roles"
+    }
+  },
+  "TABLES_NAMES": [
+    "Empresas",
+    "Maquinas",
+    "Planta",
+    "Reporte_Servicio",
+    "Reporte_Visita",
+    "Detalle_Visitas",
+    "Usuarios",
+    "Visitas",
+    "role_permissions",
+    "Configuracion",
+    "Encargado"
+  ],
+  "ACTION": [],
+  "LOCKET": []
+}

@@ -1,0 +1,220 @@
+DATA {
+
+const DATABASE_SCHEMA = {
+  EMPRESAS: {
+    nombre_tabla: "Empresa",
+    descripcion:
+      "Entidad principal de negocio. Nivel superior en la jerarquía.",
+    campos: [
+      "id",
+      "nombre",
+      "direccion",
+      "distrito",
+      "ruc",
+      "estado",
+      "created_at",
+    ],
+    relaciones_padre: [],
+    relaciones_hijo: ["Planta", "Maquinas", "Reporte_Servicio"],
+  },
+  PLANTAS: {
+    nombre_tabla: "Planta",
+    descripcion: "Ubicaciones físicas de producción.",
+    campos: ["id", "nombre", "direccion", "estado", "id_empresa", "created_at"],
+    dependencia_requerida: "EMPRESAS",
+    relaciones_padre: ["Empresa"],
+    relaciones_hijo: ["Encargado", "Maquinas", "Visitas"],
+  },
+  ENCARGADOS: {
+    nombre_tabla: "Encargado",
+    descripcion: "Personal de contacto o responsable en cada planta.",
+    campos: [
+      "id",
+      "nombre",
+      "apellido",
+      "dni",
+      "email",
+      "celular",
+      "cargo",
+      "id_planta",
+      "created_at",
+    ],
+    dependencia_requerida: "PLANTAS",
+    relaciones_padre: ["Planta"],
+    relaciones_hijo: ["Reporte_Servicio"],
+  },
+  MAQUINAS: {
+    nombre_tabla: "Maquinas",
+    descripcion: "Activos productivos, equipos o maquinaria.",
+    campos: [
+      "id",
+      "marca",
+      "linea",
+      "serie",
+      "modelo",
+      "detalles",
+      "estado",
+      "id_planta",
+      "id_empresa",
+      "created_at",
+    ],
+    dependencia_requerida: "PLANTAS",
+    relaciones_padre: ["Planta", "Empresa"],
+    relaciones_hijo: ["Detalle_Visitas"],
+  },
+  VISITAS: {
+    nombre_tabla: "Visitas",
+    descripcion: "Registros de visitas a las plantas.",
+    campos: [
+      "id",
+      "descripcion",
+      "fecha",
+      "id_planta",
+      "id_usuario",
+      "created_at",
+    ],
+    dependencia_requerida: "PLANTAS",
+    relaciones_padre: ["Planta", "Usuarios"],
+    relaciones_hijo: ["Detalle_Visitas"],
+  },
+  DETALLE_VISITAS: {
+    nombre_tabla: "Detalle_Visitas",
+    descripcion: "Detalles de lo realizado en una máquina durante una visita.",
+    campos: ["id", "detalle", "id_maquina", "id_visita", "created_at"],
+    dependencia_requerida: "VISITAS",
+    relaciones_padre: ["Maquinas", "Visitas"],
+    relaciones_hijo: [],
+  },
+  REPORTE_SERVICIO: {
+    nombre_tabla: "Reporte_Servicio",
+    descripcion: "Registro detallado de servicios técnicos realizados.",
+    campos: [
+      "id",
+      "codigo_reporte",
+      "serie_maquina",
+      "problemas_encontrados",
+      "acciones_realizadas",
+      "operativo",
+      "inoperativo",
+      "id_empresa",
+      "id_encargado",
+      "id_usuario",
+      "created_at",
+    ],
+    dependencia_requerida: "EMPRESAS",
+    relaciones_padre: ["Empresa", "Encargado", "Usuarios"],
+    relaciones_hijo: [],
+  },
+  USUARIOS: {
+    nombre_tabla: "Usuarios",
+    descripcion: "Usuarios del sistema (Técnicos, Administradores, etc.).",
+    campos: [
+      "id",
+      "nombres",
+      "usuario",
+      "email",
+      "celular",
+      "rol",
+      "estado",
+      "created_at",
+    ],
+    relaciones_padre: ["Roles"],
+    relaciones_hijo: ["Configuracion", "Reporte_Servicio", "Visitas"],
+  },
+  ROLES: {
+    nombre_tabla: "Roles",
+    descripcion: "Roles de los usuarios con sus permisos.",
+    campos: ["id", "nombre", "created_at"],
+    relaciones_padre: [],
+    relaciones_hijo: ["Usuarios", "role_permissions"],
+  },
+};
+
+
+const DB_TABLES_NAMES = [
+  "Empresas",
+  "Maquinas",
+  "Planta",
+  "Reporte_Servicio",
+  "Reporte_Visita",
+  "Detalle_Visitas",
+  "Usuarios",
+  "Visitas",
+  "role_permissions",
+  "Configuracion",
+  "Encargado",
+];
+const DB_ACTIONS_BLOCK = [
+    "DELETE","DROP" // ELIMINAR DATOS EN SUPABASE
+];
+
+}
+
+const consulta = ""//consulta que reciba 
+- solo hay 2 cosas que entender
+
+1. EL USUARIO HACE UNA CONSULTA EN LENGUAJE NATURAL.
+2. EL SERVICIO RESPONDE UNA RESPUESTA CON LOS DATOS REQUERIDOS.
+
+LA LOGICA Y METODOS A CREAR CONSULTAS Y AGREGAR DATOS SERA LO SIGUEINTE ES LA SIGUIENTE:
+para poder entregar un resultado por parte del servicio es la siguiente siguiendo los pasos.
+
+RECUERDA QUE LAS RELACIONES QUE IDENTIFICAN SON: id_planta, id_empresa, id_encargado, id_usuario, id_visita.
+METODOS:
+- init(consulta) // aqui identificamos con IA que accion quiere realizar, consultar, crear, chat y el nombre de la tabla con la que se va trabajar
+    
+    nametable = DB_TABLES_NAMES
+    nametablesRelations = DATABASE_SCHEMA
+    
+    return {
+        "action":"consultar, crear, chat", 
+        "Table":"nametable", // nombre de la tabla principal usando SearchData(consulta,DB_TABLES_NAMES)
+        "TablesRelation":["","",..], // los nombres de las tablas relacionadas (consulta,DATABASE_SCHEMA)
+        "DataTableRelation":[{},{},...] //Aqui usamos un for para hacer consultas a SupabaseQuery ya que su parametro de entrada de GenerateQuery sera un array => SupabaseQuery(GenerateQuery(TablesRelation)) para hacer las consultas de todas las tablas relacionadas
+        "queryConstructor": {
+            "queryMaster":"",
+            "queryStep":[]
+        }
+    }
+- liveChat() //AquiMantenemos la linea de conversacion
+- SearchData() // aqui buscamos datos en la DATA
+- GenerateQuery() // aqui generamos la consulta para supabase teniendo acceso a todo menos a DB_ACTIONS_BLOCK
+- SupabaseQuery() // aqui hacemos las consultas a supabase y retorna en json como data[]
+- chatGemini() {
+    //usamos DB_TABLES_NAMES y DATABASE_SCHEMA para responder preguntas generales
+    return output;
+} 
+- Response(init){
+    if(consultar){
+        
+        return {
+            response {
+                "consulta":"consulta",
+                "input": init,
+                "output": SupabaseQuery(GenerateQuery(init.queryConstructor.queryMaster))
+            } 
+        }
+    }
+    if(crear){
+
+        return {
+            response {
+                "consulta":"consulta",
+                "input": init,
+                "output": SupabaseQuery(GenerateQuery(init.queryConstructor.queryMaster))
+            } 
+        }
+    }
+    if(chat){
+
+        return {
+            "response"{
+                 "consulta":"consulta",
+                "input": init,
+                "output": chatGemini()
+            }
+        }
+    }
+
+
+}

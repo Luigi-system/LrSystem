@@ -1,0 +1,175 @@
+{
+  "name": "Empresas",
+  "item": [
+    {
+      "name": "GetAllEmpresas",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\"service\": \"empresa\", \"content\": {\"action\": \"getAllEmpresas\", \"params\": {}}}"
+        },
+        "url": {
+          "raw": "{{base_url}}/supabase",
+          "host": ["{{base_url}}"],
+          "path": ["supabase"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "GetEmpresaById",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\"service\": \"empresa\", \"content\": {\"action\": \"getEmpresaById\", \"params\": {\"id\":1}}}"
+        },
+        "url": {
+          "raw": "{{base_url}}/supabase",
+          "host": ["{{base_url}}"],
+          "path": ["supabase"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "CreateEmpresa",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\"service\": \"empresa\", \"content\": {\"action\": \"createEmpresa\", \"params\": {\"nombre\":\"Empresa A\",\"ruc\":\"12345678901\",\"distrito\":\"Lima\",\"estado\":true}}}"
+        },
+        "url": {
+          "raw": "{{base_url}}/supabase",
+          "host": ["{{base_url}}"],
+          "path": ["supabase"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "UpdateEmpresa",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\"service\": \"empresa\", \"content\": {\"action\": \"updateEmpresa\", \"params\": {\"id\":1,\"nombre\":\"Empresa B\",\"estado\":false}}}"
+        },
+        "url": {
+          "raw": "{{base_url}}/supabase",
+          "host": ["{{base_url}}"],
+          "path": ["supabase"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "DeleteEmpresa",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\"service\": \"empresa\", \"content\": {\"action\": \"deleteEmpresa\", \"params\": {\"id\":1}}}"
+        },
+        "url": {
+          "raw": "{{base_url}}/supabase",
+          "host": ["{{base_url}}"],
+          "path": ["supabase"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "GetEmpresasByRUC",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\"service\": \"empresa\", \"content\": {\"action\": \"getEmpresasByRUC\", \"params\": {\"ruc\":\"12345678901\"}}}"
+        },
+        "url": {
+          "raw": "{{base_url}}/supabase",
+          "host": ["{{base_url}}"],
+          "path": ["supabase"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "GetEmpresasByDistrito",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\"service\": \"empresa\", \"content\": {\"action\": \"getEmpresasByDistrito\", \"params\": {\"distrito\":\"Lima\"}}}"
+        },
+        "url": {
+          "raw": "{{base_url}}/supabase",
+          "host": ["{{base_url}}"],
+          "path": ["supabase"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "ToggleEmpresaStatus",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\"service\": \"empresa\", \"content\": {\"action\": \"toggleEmpresaStatus\", \"params\": {\"id\":1,\"estado\":true}}}"
+        },
+        "url": {
+          "raw": "{{base_url}}/supabase",
+          "host": ["{{base_url}}"],
+          "path": ["supabase"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "PaginateEmpresas",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\"service\": \"empresa\", \"content\": {\"action\": \"paginateEmpresas\", \"params\": {\"page\":1,\"pageSize\":10}}}"
+        },
+        "url": {
+          "raw": "{{base_url}}/supabase",
+          "host": ["{{base_url}}"],
+          "path": ["supabase"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "SearchEmpresasByName",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\"service\": \"empresa\", \"content\": {\"action\": \"searchEmpresasByName\", \"params\": {\"nombre\":\"Empresa\"}}}"
+        },
+        "url": {
+          "raw": "{{base_url}}/supabase",
+          "host": ["{{base_url}}"],
+          "path": ["supabase"]
+        }
+      },
+      "response": []
+    }
+  ]
+}

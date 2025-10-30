@@ -1,0 +1,220 @@
+{
+  "ui_schema": {
+    "low_level_objects": [
+      {
+        "type": "field",
+        "purpose": "Campo de entrada de texto genérico (Nombre, Dirección, etc.).",
+        "attributes": [
+          {
+            "name": "label",
+            "dataType": "string",
+            "description": "Etiqueta visible para el usuario."
+          },
+          {
+            "name": "name",
+            "dataType": "string",
+            "description": "Nombre de la variable para el envío de datos."
+          },
+          {
+            "name": "inputType",
+            "dataType": "string",
+            "description": "Tipo de entrada HTML esperado (ej. 'text', 'number', 'email')."
+          },
+          {
+            "name": "required",
+            "dataType": "boolean",
+            "description": "Indica si el campo es obligatorio."
+          },
+          {
+            "name": "value",
+            "dataType": "string",
+            "description": "Valor actual o predeterminado del campo."
+          }
+        ]
+      },
+      {
+        "type": "checkbox",
+        "purpose": "Opción de selección binaria (sí/no, acepto términos).",
+        "attributes": [
+          {
+            "name": "label",
+            "dataType": "string",
+            "description": "Texto descriptivo junto al checkbox."
+          },
+          {
+            "name": "name",
+            "dataType": "string",
+            "description": "Nombre de la variable para el envío de datos."
+          },
+          {
+            "name": "checked",
+            "dataType": "boolean",
+            "description": "Estado actual del checkbox (true si está marcado)."
+          }
+        ]
+      },
+      {
+        "type": "button",
+        "purpose": "Elemento interactivo para iniciar una acción. Crítico para la IA.",
+        "attributes": [
+          {
+            "name": "label",
+            "dataType": "string",
+            "description": "Texto visible del botón."
+          },
+          {
+            "name": "action",
+            "dataType": "string",
+            "description": "Código interno o nombre de la acción que el chatbot debe ejecutar (ej. 'saveUser')."
+          },
+          {
+            "name": "api",
+            "dataType": "string",
+            "description": "URL del endpoint de backend al que se debe enviar la solicitud."
+          },
+          {
+            "name": "method",
+            "dataType": "string",
+            "description": "Método HTTP a usar ('POST', 'GET', 'PUT', 'DELETE')."
+          },
+          {
+            "name": "style",
+            "dataType": "object",
+            "description": "Propiedades de estilo o clase (ej. {class: 'btn-primary'})."
+          }
+        ]
+      },
+      {
+        "type": "label",
+        "purpose": "Texto descriptivo simple.",
+        "attributes": [
+          {
+            "name": "text",
+            "dataType": "string",
+            "description": "Contenido del texto."
+          },
+          {
+            "name": "style",
+            "dataType": "object",
+            "description": "Propiedades de estilo o clase."
+          }
+        ]
+      },
+      {
+        "type": "file_base64",
+        "purpose": "Permite subir archivos, que deben ser serializados en Base64.",
+        "attributes": [
+          {
+            "name": "label",
+            "dataType": "string",
+            "description": "Etiqueta del control de archivo."
+          },
+          {
+            "name": "name",
+            "dataType": "string",
+            "description": "Nombre de la variable."
+          },
+          {
+            "name": "mimeType",
+            "dataType": "string",
+            "description": "Tipo MIME esperado (ej. 'image/png')."
+          },
+          {
+            "name": "maxSize",
+            "dataType": "number",
+            "description": "Tamaño máximo del archivo en bytes."
+          },
+          {
+            "name": "value",
+            "dataType": "string",
+            "description": "Datos del archivo codificados en Base64."
+          }
+        ]
+      },
+      {
+        "type": "combobox",
+        "purpose": "Desplegable con opciones de selección (select/dropdown).",
+        "attributes": [
+          {
+            "name": "label",
+            "dataType": "string",
+            "description": "Etiqueta del combobox."
+          },
+          {
+            "name": "name",
+            "dataType": "string",
+            "description": "Nombre de la variable."
+          },
+          {
+            "name": "options",
+            "dataType": "array",
+            "description": "Array de opciones disponibles (strings o objetos {value, label})."
+          },
+          {
+            "name": "value",
+            "dataType": "string",
+            "description": "Opción actualmente seleccionada."
+          }
+        ]
+      },
+      {
+        "type": "list",
+        "purpose": "Visualización simple de elementos no interactivos.",
+        "attributes": [
+          {
+            "name": "title",
+            "dataType": "string",
+            "description": "Título de la lista."
+          },
+          {
+            "name": "items",
+            "dataType": "array",
+            "description": "Array de elementos (strings o objetos)."
+          }
+        ]
+      },
+      {
+        "type": "hidden",
+        "purpose": "Campo que almacena datos de contexto (ej. ID de sesión).",
+        "attributes": [
+          {
+            "name": "name",
+            "dataType": "string",
+            "description": "Nombre de la variable."
+          },
+          {
+            "name": "value",
+            "dataType": "string",
+            "description": "Valor de contexto a enviar."
+          }
+        ]
+      }
+    ],
+    "key_functional_attributes": [
+      {
+        "attribute": "action",
+        "component_applicable": "button",
+        "dataType": "string",
+        "description": "Nombre de la acción que el chatbot debe ejecutar (ej. saveUser, searchData, nextStep). Crucial para la lógica IA."
+      },
+      {
+        "attribute": "api",
+        "component_applicable": "button",
+        "dataType": "string",
+        "description": "URL del endpoint del backend al que se debe enviar la solicitud."
+      },
+      {
+        "attribute": "method",
+        "component_applicable": "button",
+        "dataType": "string",
+        "description": "Método HTTP a usar (POST para guardar, GET para buscar)."
+      },
+      {
+        "attribute": "data_rows",
+        "component_applicable": "table, chart",
+        "dataType": "array",
+        "description": "Propiedad que contendrá los datos, ya sean generados por la IA (populateComponent) o provenientes de una API."
+      }
+    ]
+  }
+}
