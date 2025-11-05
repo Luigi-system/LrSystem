@@ -495,7 +495,7 @@ ENCARGADO:
 - resetPasswordEncargado (resetear contraseña encargado)
 
 REPORTE_SERVICIO:
-- searchReporteServicio (búsqueda con filtros: por id, código_reporte, nombre_usuario, encargado, empresa, planta, máquina, fechas, estados)
+- searchReporteServicio (búsqueda con filtros: por id, código_reporte, nombre_usuario, encargado, empresa, serie, marca, linea, modelo, planta, máquina, fechas, estados)
 - listReporteServicio (listar todos sin filtros)
 - getReporteServicioById (obtener reporte específico por ID)
 - createReporteServicio (crear nuevo reporte)
@@ -503,7 +503,7 @@ REPORTE_SERVICIO:
 - deleteReporteServicio (eliminar reporte)
 
 REPORTE_VISITA:
-- searchReporteVisita (búsqueda con filtros: por id, cliente, encargado, operador, planta, empresa, fechas, condiciones técnicas)
+- searchReporteVisita (búsqueda con filtros: por id, cliente, encargado, operador, planta,  empresa, serie, marca, linea, modelo, fechas, condiciones técnicas)
 - listReporteVisita (listar todos sin filtros)
 - getReporteVisitaById (obtener reporte específico por ID)
 - createReporteVisita (crear nuevo reporte)
