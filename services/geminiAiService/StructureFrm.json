@@ -5,7 +5,7 @@
         "type": "field",
         "purpose": "Campo de entrada de texto genérico (Nombre, Dirección, etc.).",
         "attributes": [
-          {
+          {.
             "name": "label",
             "dataType": "string",
             "description": "Etiqueta visible para el usuario."

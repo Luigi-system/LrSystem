@@ -1,13 +1,60 @@
 // services/supabase/empresas.js
-// 🔹 Funciones de empresas para Supabase
+// 🔹 Funciones de empresas para Supabase - SIMPLIFICADO
 
-// Listar todas las empresas
+// 🔍 BÚSQUEDA UNIFICADA - Único método necesario
+export async function searchEmpresas(supabase, params, res) {
+  try {
+    const { id, nombre, ruc, distrito, estado, search } = params;
+    let query = supabase.from("Empresa").select("*");
+
+    // Búsqueda por ID exacto
+    if (id) {
+      query = query.eq("id", id);
+    }
+
+    // Búsqueda por nombre (coincidencia parcial case-insensitive)
+    if (nombre) {
+      query = query.ilike("nombre", `%${nombre}%`);
+    }
+
+    // Búsqueda por RUC (coincidencia parcial)
+    if (ruc) {
+      query = query.ilike("ruc", `%${ruc}%`);
+    }
+
+    // Búsqueda por distrito (coincidencia parcial)
+    if (distrito) {
+      query = query.ilike("distrito", `%${distrito}%`);
+    }
+
+    // Búsqueda por estado
+    if (estado !== undefined) {
+      query = query.eq("estado", estado);
+    }
+
+    // Búsqueda general en múltiples campos
+    if (search) {
+      query = query.or(`nombre.ilike.%${search}%,ruc.ilike.%${search}%,distrito.ilike.%${search}%`);
+    }
+
+    // Si no hay filtros, devolver todas las empresas
+    const { data, error } = await query.order("nombre");
+    if (error) throw error;
+
+    res.json(data);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+}
+
+// 📋 LISTAR TODAS LAS EMPRESAS (sin filtros)
 export async function listEmpresas(supabase, params, res) {
   try {
     const { data, error } = await supabase
       .from("Empresa")
       .select("*")
-      .order("nombre");
+      .order("nombre", { ascending: true });
+
     if (error) throw error;
     res.json(data);
   } catch (err) {
@@ -15,19 +62,35 @@ export async function listEmpresas(supabase, params, res) {
   }
 }
 
-// Obtener empresa por ID
-export async function getEmpresa(supabase, params, res) {
+// 🔎 OBTENER EMPRESA POR ID ESPECÍFICO
+export async function getEmpresaById(supabase, params, res) {
   try {
     const { id } = params;
+
+    if (!id) {
+      return res.status(400).json({ error: "Se requiere el parámetro 'id'" });
+    }
+
     const { data, error } = await supabase
       .from("Empresa")
       .select("*")
       .eq("id", id)
-      .single();
+      .single(); // .single() asegura que retorne un solo objeto, no un array
+
     if (error) throw error;
+
+    if (!data) {
+      return res.status(404).json({ error: "Empresa no encontrada" });
+    }
+
     res.json(data);
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    if (err.code === 'PGRST116') {
+      // Error cuando no se encuentra el registro con .single()
+      res.status(404).json({ error: "Empresa no encontrada" });
+    } else {
+      res.status(500).json({ error: err.message });
+    }
   }
 }
 
@@ -78,94 +141,12 @@ export async function deleteEmpresa(supabase, params, res) {
   }
 }
 
-// Buscar empresa por RUC
-export async function getEmpresasByRUC(supabase, params, res) {
-  try {
-    const { ruc } = params;
-    const { data, error } = await supabase
-      .from("Empresa")
-      .select("*")
-      .eq("ruc", ruc);
-    if (error) throw error;
-    res.json(data);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-}
-
-// Buscar empresa por distrito
-export async function getEmpresasByDistrito(supabase, params, res) {
-  try {
-    const { distrito } = params;
-    const { data, error } = await supabase
-      .from("Empresa")
-      .select("*")
-      .eq("distrito", distrito);
-    if (error) throw error;
-    res.json(data);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-}
-
-// Activar o desactivar empresa
-export async function toggleEmpresaStatus(supabase, params, res) {
-  try {
-    const { id, estado } = params;
-    const { data, error } = await supabase
-      .from("Empresa")
-      .update({ estado })
-      .eq("id", id)
-      .select();
-    if (error) throw error;
-    res.json({ message: "Estado actualizado", data });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-}
-
-// Buscar empresa por nombre
-export async function searchEmpresasByName(supabase, params, res) {
-  try {
-    const { nombre } = params;
-    const { data, error } = await supabase
-      .from("Empresa")
-      .select("*")
-      .ilike("nombre", `%${nombre}%`);
-    if (error) throw error;
-    res.json(data);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-}
-
-// Paginación
-export async function paginateEmpresas(supabase, params, res) {
-  try {
-    const { page = 1, pageSize = 10 } = params;
-    const from = (page - 1) * pageSize;
-    const to = from + pageSize - 1;
-    const { data, error } = await supabase
-      .from("Empresa")
-      .select("*")
-      .range(from, to);
-    if (error) throw error;
-    res.json(data);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-}
-
-// Exportar todas las funciones
+// Exportar solo las funciones esenciales
 export const empresaFunctions = {
-  listEmpresas,
-  getEmpresa,
+  searchEmpresas,  // ✅ Búsqueda con filtros
+  listEmpresas,    // ✅ Listar todas sin filtros
+  getEmpresaById,  // ✅ Obtener por ID específico
   createEmpresa,
   updateEmpresa,
   deleteEmpresa,
-  getEmpresasByRUC,
-  getEmpresasByDistrito,
-  toggleEmpresaStatus,
-  searchEmpresasByName,
-  paginateEmpresas,
 };
