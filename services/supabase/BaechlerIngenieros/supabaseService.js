@@ -10,8 +10,8 @@ import * as configuraciones from "./configuraciones.js";
 import * as plantas from "./plantas.js";
 import * as maquinas from "./maquinas.js";
 import * as encargados from "./encargados.js";
-import * as reporteServicio from "./reporteServicio.js"; // ✅ NUEVO
-import * as reporteVisita from "./reporteVisita.js"; // ✅ NUEVO
+import * as reporteServicio from "./reporteServicio.js";
+import * as reporteVisita from "./reporteVisita.js";
 
 dotenv.config();
 const router = express.Router();
@@ -22,6 +22,48 @@ const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
+
+// 🎯 DETECTOR DE COMPORTAMIENTO GENERAL
+class BehaviorDetector {
+  /**
+   * Detecta si la consulta es un saludo, despedida, o necesita comportamiento especial
+   */
+  static detectGeneralBehavior(query) {
+    const lowerQuery = query.toLowerCase().trim();
+
+    // Saludos
+    const saludos = [
+      'hola', 'hi', 'hello', 'buenos días', 'buenas tardes', 'buenas noches',
+      'hey', 'qué tal', 'cómo estás', 'saludos', 'buen día'
+    ];
+
+    // Despedidas
+    const despedidas = [
+      'adiós', 'bye', 'chao', 'hasta luego', 'nos vemos', 'hasta pronto',
+      'hasta la vista', 'que tengas buen día', 'gracias', 'thanks'
+    ];
+
+    // Preguntas sobre capacidades
+    const capacidades = [
+      'qué puedes hacer', 'qué sabes hacer', 'cuáles son tus funciones',
+      'ayuda', 'help', 'funciones', 'capacidades', 'qué ofreces'
+    ];
+
+    if (saludos.some(saludo => lowerQuery.includes(saludo))) {
+      return { tipo: 'saludo', prioridad: 1 };
+    }
+
+    if (despedidas.some(despedida => lowerQuery.includes(despedida))) {
+      return { tipo: 'despedida', prioridad: 1 };
+    }
+
+    if (capacidades.some(capacidad => lowerQuery.includes(capacidad))) {
+      return { tipo: 'capacidades', prioridad: 1 };
+    }
+
+    return { tipo: 'consulta_normal', prioridad: 0 };
+  }
+}
 
 // 🎯 CONSTRUCTOR DE COMPONENTES PARA EL CHATBOT - AGENTE PROFESIONAL Y AVANZADO
 class ComponentBuilder {
@@ -46,6 +88,172 @@ class ComponentBuilder {
   }
 
   /**
+   * Construye componente de saludo
+   */
+  static buildSaludoComponent() {
+    const saludos = [
+      "¡Hola! 👋 Soy tu asistente de gestión empresarial.",
+      "¡Buen día! 🌟 Estoy aquí para ayudarte con tu sistema de gestión.",
+      "¡Hola! 🤖 Listo para asistirte con empresas, plantas, máquinas y reportes."
+    ];
+
+    const saludoAleatorio = saludos[Math.floor(Math.random() * saludos.length)];
+
+    return {
+      displayText: saludoAleatorio,
+      suggestions: [
+        "Buscar información de una empresa",
+        "Listar todas las plantas",
+        "Ver reportes de servicio recientes",
+        "Consultar máquinas disponibles"
+      ],
+      quickActions: [
+        {
+          label: "📊 Ver Empresas",
+          prompt: "Listar todas las empresas"
+        },
+        {
+          label: "🏭 Ver Plantas",
+          prompt: "Listar todas las plantas"
+        },
+        {
+          label: "🔧 Ver Máquinas",
+          prompt: "Listar todas las máquinas"
+        },
+        {
+          label: "📋 Ver Reportes",
+          prompt: "Mostrar reportes recientes"
+        }
+      ]
+    };
+  }
+
+  /**
+   * Construye componente de despedida
+   */
+  static buildDespedidaComponent() {
+    const despedidas = [
+      "¡Hasta luego! 👋 Fue un gusto ayudarte.",
+      "¡Que tengas un excelente día! 🌟",
+      "¡Nos vemos! 🤖 No dudes en consultarme cuando lo necesites."
+    ];
+
+    return {
+      displayText: despedidas[Math.floor(Math.random() * despedidas.length)],
+      statusDisplay: {
+        icon: 'success',
+        title: '¡Hasta pronto!',
+        message: 'Gracias por usar nuestro servicio'
+      }
+    };
+  }
+
+  /**
+   * Construye componente de capacidades
+   */
+  static buildCapacidadesComponent() {
+    return {
+      displayText: "🔧 **Mis Capacidades como Asistente de Gestión**",
+      recordView: {
+        fields: [
+          { label: "👥 Gestión de Usuarios", value: "Buscar, listar y gestionar usuarios del sistema" },
+          { label: "🏢 Gestión de Empresas", value: "Consultar empresas por nombre, RUC, ubicación" },
+          { label: "🏭 Gestión de Plantas", value: "Administrar plantas industriales y sus datos" },
+          { label: "🔧 Gestión de Máquinas", value: "Controlar inventario de máquinas y equipos" },
+          { label: "👨‍💼 Gestión de Encargados", value: "Gestionar personal a cargo de plantas/máquinas" },
+          { label: "📋 Reportes de Servicio", value: "Consultar y generar reportes técnicos" },
+          { label: "📊 Reportes de Visita", value: "Revisar reportes de visitas técnicas" }
+        ],
+        editable: false
+      },
+      suggestions: [
+        "Mostrar empresas disponibles",
+        "Ver plantas de una empresa específica",
+        "Consultar máquinas por marca o modelo",
+        "Generar reporte de servicio"
+      ]
+    };
+  }
+
+  /**
+   * Construye componente para resultados no encontrados
+   */
+  static buildNoResultsComponent(identificacion) {
+    const categoria = identificacion?.categoria;
+    const parametros = identificacion?.parametros_sugeridos || {};
+
+    let mensajePrincipal = "No se encontraron resultados para tu búsqueda.";
+    let sugerenciasEspecificas = [];
+
+    if (categoria && Object.keys(parametros).length > 0) {
+      const nombreCategoria = this.getSingularName(categoria);
+      mensajePrincipal = `No se encontraron ${this.getPluralName(categoria)} con los criterios especificados.`;
+
+      sugerenciasEspecificas = [
+        `Verificar los parámetros de búsqueda para ${nombreCategoria}`,
+        `Intentar con términos más generales`,
+        `Listar todos los ${this.getPluralName(categoria)} disponibles`
+      ];
+    }
+
+    return {
+      displayText: mensajePrincipal,
+      statusDisplay: {
+        icon: 'info',
+        title: 'Sin resultados',
+        message: 'Prueba con otros criterios de búsqueda'
+      },
+      suggestions: [
+        ...sugerenciasEspecificas,
+        "Realizar una búsqueda más amplia",
+        "Verificar la ortografía de los términos",
+        "Contactar con soporte si el problema persiste"
+      ]
+    };
+  }
+
+  /**
+   * Construye componente de error
+   */
+  static buildErrorComponent(error, consultaOriginal = "") {
+    const erroresComunes = {
+      "Error interno del servidor": "El servidor está experimentando problemas temporales.",
+      "Error de conexión": "No se pudo conectar con la base de datos.",
+      "Timeout": "La consulta tardó demasiado tiempo en procesarse.",
+      "Sin permisos": "No tienes permisos para realizar esta acción."
+    };
+
+    const mensajeError = erroresComunes[error] || error;
+
+    return {
+      displayText: `❌ **Error en la consulta**\n\n${mensajeError}`,
+      statusDisplay: {
+        icon: 'error',
+        title: 'Error del Sistema',
+        message: `No se pudo procesar: "${consultaOriginal}"`
+      },
+      suggestions: [
+        "Intentar nuevamente en unos momentos",
+        "Verificar la conexión a internet",
+        "Contactar al administrador del sistema",
+        "Probar con una consulta diferente"
+      ],
+      actions: [
+        {
+          label: "🔄 Reintentar",
+          prompt: consultaOriginal,
+          style: "primary"
+        },
+        {
+          label: "🏠 Volver al Inicio",
+          prompt: "Hola",
+          style: "secondary"
+        }
+      ]
+    };
+  }
+
+  /**
    * Construye componente para un solo registro
    */
   static buildSingleRecordComponent(categoria, registro, identificacion) {
@@ -59,7 +267,7 @@ class ComponentBuilder {
     })).filter(field => field.value !== 'No disponible');
 
     return {
-      displayText: `Se encontró ${this.getSingularName(categoria)}:`,
+      displayText: `✅ **Se encontró ${this.getSingularName(categoria)}**`,
       recordView: {
         fields: fields,
         editable: false
@@ -80,7 +288,7 @@ class ComponentBuilder {
     }));
 
     return {
-      displayText: `Se encontraron ${registros.length} ${this.getPluralName(categoria)}:`,
+      displayText: `📊 **Se encontraron ${registros.length} ${this.getPluralName(categoria)}**`,
       tableComponent: {
         columns: columns,
         data: registros,
@@ -495,7 +703,7 @@ ENCARGADO:
 - resetPasswordEncargado (resetear contraseña encargado)
 
 REPORTE_SERVICIO:
-- searchReporteServicio (búsqueda con filtros: por id, código_reporte, nombre_usuario, encargado, empresa, serie, marca, linea, modelo, planta, máquina, fechas, estados)
+- searchReporteServicio (búsqueda con filtros: por id, código_reporte, nombre_usuario, encargado, empresa, serie, marca_maquina, linea, serie_maquina, modelo_maquina, planta, máquina, fechas, estados)
 - listReporteServicio (listar todos sin filtros)
 - getReporteServicioById (obtener reporte específico por ID)
 - createReporteServicio (crear nuevo reporte)
@@ -663,7 +871,7 @@ function responder(res, status, data) {
   });
 }
 
-// ✅ ENDPOINT PRINCIPAL MEJORADO CON CONSTRUCCIÓN DE COMPONENTES
+// ✅ ENDPOINT PRINCIPAL MEJORADO CON COMPORTAMIENTO GENERAL
 router.post("/", async (req, res) => {
   try {
     const { service, content } = req.body;
@@ -675,12 +883,45 @@ router.post("/", async (req, res) => {
 
     console.log(`🔍 [${service}] Acción: ${action || "consultaAI"} | Query: ${query || "-"}`);
 
+    // 💬 DETECCIÓN DE COMPORTAMIENTO GENERAL
+    const comportamiento = BehaviorDetector.detectGeneralBehavior(query);
+
+    // Comportamientos especiales (saludos, despedidas, etc.)
+    if (comportamiento.tipo !== 'consulta_normal') {
+      let component;
+
+      switch (comportamiento.tipo) {
+        case 'saludo':
+          component = ComponentBuilder.buildSaludoComponent();
+          break;
+        case 'despedida':
+          component = ComponentBuilder.buildDespedidaComponent();
+          break;
+        case 'capacidades':
+          component = ComponentBuilder.buildCapacidadesComponent();
+          break;
+      }
+
+      return responder(res, 200, {
+        comportamiento: comportamiento.tipo,
+        component,
+        mensaje: "Comportamiento general detectado"
+      });
+    }
+
     // 💬 SERVICIO IA CON ORQUESTADOR Y CONSTRUCCIÓN DE COMPONENTES
     if (service === "consultaAI") {
       const identificacion = await consultaAI(query);
 
       if (identificacion.error) {
-        return responder(res, 400, identificacion);
+        const errorComponent = ComponentBuilder.buildErrorComponent(
+          identificacion.error,
+          query
+        );
+        return responder(res, 400, {
+          error: identificacion.error,
+          component: errorComponent
+        });
       }
 
       // Combinar parámetros (IA + proporcionados)
@@ -697,6 +938,27 @@ router.post("/", async (req, res) => {
 
         const datos = resultadosEjecucion.map(item => item.data);
 
+        // Verificar si hay resultados
+        const tieneResultados = datos && datos.length > 0 &&
+          datos[0] &&
+          !datos[0].error &&
+          (!Array.isArray(datos[0]) || datos[0].length > 0);
+
+        if (!tieneResultados) {
+          // No hay resultados
+          const noResultsComponent = ComponentBuilder.buildNoResultsComponent(identificacion);
+          return responder(res, 200, {
+            identificacion: {
+              categoria: identificacion.categoria,
+              acciones: identificacion.acciones,
+              explicacion: identificacion.explicacion,
+              parametros_utilizados: parametrosCombinados
+            },
+            datos: [],
+            component: noResultsComponent
+          });
+        }
+
         // ✅ CONSTRUIR COMPONENTE PARA EL CHATBOT
         const component = ComponentBuilder.buildComponent(
           identificacion.categoria,
@@ -712,11 +974,11 @@ router.post("/", async (req, res) => {
             parametros_utilizados: parametrosCombinados
           },
           datos,
-          component // ✅ NUEVO: Componente construido automáticamente
+          component
         });
       }
 
-      // Solo identificación
+      // Solo identificación (necesita parámetros adicionales)
       return responder(res, 200, {
         identificacion: {
           categoria: identificacion.categoria,
@@ -740,7 +1002,14 @@ router.post("/", async (req, res) => {
 
   } catch (err) {
     console.error("💥 Error en endpoint /supabase:", err);
-    return responder(res, 500, { error: "Error interno del servidor" });
+    const errorComponent = ComponentBuilder.buildErrorComponent(
+      "Error interno del servidor",
+      req.body?.content?.query || "Consulta no especificada"
+    );
+    return responder(res, 500, {
+      error: "Error interno del servidor",
+      component: errorComponent
+    });
   }
 });
 
