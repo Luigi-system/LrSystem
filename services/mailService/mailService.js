@@ -18,7 +18,7 @@ function createTransporter(host) {
       pass: process.env.BREVO_PASS,
     },
     tls: {
-      rejectUnauthorized: false, // evita error de certificado en algunos hosts
+      rejectUnauthorized: false, // evita error de certificado
     },
   });
 }
@@ -26,7 +26,7 @@ function createTransporter(host) {
 /**
  * Intenta enviar el correo con diferentes hosts
  */
-async function trySendEmail({ from, to, subject, message }) {
+async function trySendEmail({ from, to, subject, message, attachments }) {
   const hosts = [
     "smtp-relay.sendinblue.com", // ✅ principal
     "smtp-relay.brevo.com",      // 🔄 alternativo
@@ -38,20 +38,20 @@ async function trySendEmail({ from, to, subject, message }) {
     const transporter = createTransporter(host);
     try {
       const info = await transporter.sendMail({
-        from, // ahora usa el remitente recibido por parámetro
+        from,
         to,
         subject,
         html: `<p>${message}</p>`,
+        attachments: attachments || [], // si no hay adjuntos, usa un array vacío
       });
       console.log(`📧 Correo enviado con ${host}:`, info.messageId);
-      return info; // si se envía correctamente, retorna
+      return info;
     } catch (err) {
       console.warn(`⚠️ Falló con ${host}:`, err.message);
       lastError = err;
     }
   }
 
-  // si todos fallaron
   throw lastError;
 }
 
@@ -59,18 +59,23 @@ async function trySendEmail({ from, to, subject, message }) {
  * Endpoint para enviar correo
  */
 router.post("/", async (req, res) => {
-  const { from, to, subject, message } = req.body;
+  const { from, to, subject, message, attachments } = req.body;
 
   if (!from || !to || !subject || !message) {
-    return res.status(400).json({ error: "Faltan campos requeridos (from, to, subject, message)" });
+    return res.status(400).json({
+      error: "Faltan campos requeridos (from, to, subject, message)",
+    });
   }
 
   try {
-    const info = await trySendEmail({ from, to, subject, message });
+    const info = await trySendEmail({ from, to, subject, message, attachments });
     res.json({ success: true, messageId: info.messageId });
   } catch (error) {
     console.error("❌ Error al enviar correo:", error);
-    res.status(500).json({ error: "No se pudo enviar el correo", details: error.message });
+    res.status(500).json({
+      error: "No se pudo enviar el correo",
+      details: error.message,
+    });
   }
 });
 
