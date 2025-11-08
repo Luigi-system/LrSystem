@@ -93,7 +93,7 @@ class ComponentBuilder {
   static buildSaludoComponent() {
     const saludos = [
       "¡Hola! 👋 Soy tu asistente de gestión empresarial.",
-      "¡Buen día! 🌟 Estoy aquí para ayudarte con tu sistema de gestión.",
+      "¡Bienvenido! Estoy aquí para ayudarte con tu sistema de gestión.",
       "¡Hola! 🤖 Listo para asistirte con empresas, plantas, máquinas y reportes."
     ];
 

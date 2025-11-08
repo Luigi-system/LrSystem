@@ -5,6 +5,8 @@ import geminiRouter from "./services/geminiAiService/geminiAiService.js";
 import openaiRouter from "./services/openAiService/openAiService.js";
 import whatsappRouter from "./services/whatsappService/whatsappService.js";
 import supabaseRouter from "./services/supabase/BaechlerIngenieros/supabaseService.js";
+import mailRouter from "./services/mailService/mailService.js"; // 👈 nuevo
+
 
 dotenv.config();
 
@@ -17,6 +19,7 @@ app.use("/gemini", geminiRouter);
 app.use("/openai", openaiRouter);
 app.use("/whatsapp", whatsappRouter);
 app.use("/supabase", supabaseRouter);
+app.use("/mail", mailRouter); // 👈 nuevo servicio de correo
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
