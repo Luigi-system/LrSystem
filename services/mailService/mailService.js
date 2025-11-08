@@ -18,7 +18,7 @@ function createTransporter(host) {
       pass: process.env.BREVO_PASS,
     },
     tls: {
-      rejectUnauthorized: false, // evita error de certificado
+      rejectUnauthorized: false,
     },
   });
 }
@@ -42,8 +42,19 @@ async function trySendEmail({ from, to, subject, message, attachments }) {
         to,
         subject,
         html: `<p>${message}</p>`,
-        attachments: attachments || [], // si no hay adjuntos, usa un array vacío
+        attachments: attachments?.map((a) => {
+          if (a.content && a.encoding === "base64") {
+            // Si viene en base64, lo decodificamos
+            return {
+              filename: a.filename,
+              content: Buffer.from(a.content, "base64"),
+            };
+          } else {
+            return a;
+          }
+        }) || [],
       });
+
       console.log(`📧 Correo enviado con ${host}:`, info.messageId);
       return info;
     } catch (err) {
