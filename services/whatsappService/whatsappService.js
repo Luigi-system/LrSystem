@@ -38,7 +38,21 @@ client.on("disconnected", () => {
   console.log("⚠️ Cliente desconectado");
 });
 
-client.initialize();
+// 🚀 Inicialización del cliente con manejo de errores y espera
+(async () => {
+  try {
+    console.log("🕒 Iniciando cliente de WhatsApp...");
+    await client.initialize();
+
+    // ✅ Espera 3 segundos para evitar el error de navegación de Puppeteer
+    await new Promise((resolve) => setTimeout(resolve, 3000));
+
+    console.log("✅ Cliente WhatsApp inicializado correctamente");
+  } catch (error) {
+    console.error("❌ Error al inicializar cliente de WhatsApp:", error.message);
+    console.error("🧠 Sugerencia: elimina la carpeta '.wwebjs_auth' y vuelve a ejecutar.");
+  }
+})();
 
 // 📡 0️⃣ Endpoint para ver el QR actual
 router.get("/qr", async (req, res) => {
