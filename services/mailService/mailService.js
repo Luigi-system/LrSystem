@@ -1,9 +1,23 @@
 import express from "express";
 import nodemailer from "nodemailer";
 import dotenv from "dotenv";
+import cors from "cors";
 
 dotenv.config();
 const router = express.Router();
+
+/* --------------------- CORS FIX --------------------- */
+router.use(
+  cors({
+    origin: "*",
+    methods: ["POST", "GET"],
+    allowedHeaders: ["Content-Type"],
+  })
+);
+
+/* --------------------- BODY LIMIT FIX --------------------- */
+router.use(express.json({ limit: "50mb" }));
+router.use(express.urlencoded({ limit: "50mb", extended: true }));
 
 /**
  * Crea un transporter con el host especificado
@@ -28,8 +42,8 @@ function createTransporter(host) {
  */
 async function trySendEmail({ from, to, subject, message, attachments }) {
   const hosts = [
-    "smtp-relay.sendinblue.com", // ✅ principal
-    "smtp-relay.brevo.com",      // 🔄 alternativo
+    "smtp-relay.sendinblue.com",
+    "smtp-relay.brevo.com",
   ];
 
   let lastError = null;
@@ -41,18 +55,11 @@ async function trySendEmail({ from, to, subject, message, attachments }) {
         from,
         to,
         subject,
-        html: `<p>${message}</p>`,
-        attachments: attachments?.map((a) => {
-          if (a.content && a.encoding === "base64") {
-            // Si viene en base64, lo decodificamos
-            return {
-              filename: a.filename,
-              content: Buffer.from(a.content, "base64"),
-            };
-          } else {
-            return a;
-          }
-        }) || [],
+        html: message,
+        attachments: attachments?.map((a) => ({
+          filename: a.filename,
+          content: Buffer.from(a.content, "base64"),
+        })) || [],
       });
 
       console.log(`📧 Correo enviado con ${host}:`, info.messageId);
