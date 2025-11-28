@@ -171,4 +171,36 @@ router.get("/checkNumber/:number", async (req, res) => {
   }
 });
 
+// 🔌 6️⃣ Desconectar del servicio
+router.post("/exit", async (req, res) => {
+  try {
+    if (!client) {
+      return res.status(400).json({ success: false, message: "Cliente no inicializado" });
+    }
+
+    console.log("🔌 Desconectando cliente de WhatsApp...");
+
+    await client.logout();  // Cerrar sesión de WhatsApp
+    await client.destroy(); // Destruir Puppeteer y recursos internos
+
+    clientStatus = "Desconectado ❌";
+    qrCodeData = null;
+
+    return res.json({
+      success: true,
+      message: "Cliente desconectado correctamente",
+      status: clientStatus,
+    });
+
+  } catch (error) {
+    console.error("❌ Error al desconectar:", error);
+    return res.status(500).json({
+      success: false,
+      message: "No se pudo desconectar del servicio",
+      error: error.message,
+    });
+  }
+});
+
+
 export default router;
