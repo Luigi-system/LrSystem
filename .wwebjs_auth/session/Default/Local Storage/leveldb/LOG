@@ -1,3 +1,9 @@
-2025/11/16-01:35:38.323 5670 Reusing MANIFEST C:\Vs Code Project\Services\Backend\.wwebjs_auth\session\Default\Local Storage\leveldb/MANIFEST-000001
-2025/11/16-01:35:38.324 5670 Recovering log #7
-2025/11/16-01:35:38.324 5670 Reusing old log C:\Vs Code Project\Services\Backend\.wwebjs_auth\session\Default\Local Storage\leveldb/000007.log 
+2025/11/27-23:32:11.342 b14 Creating DB C:\Vs Code Project\Services\Backend\.wwebjs_auth\session\Default\Local Storage\leveldb since it was missing.
+2025/11/27-23:32:11.417 b14 Reusing MANIFEST C:\Vs Code Project\Services\Backend\.wwebjs_auth\session\Default\Local Storage\leveldb/MANIFEST-000001
+2025/11/27-23:32:11.418 b14 Recovering log #7
+2025/11/27-23:32:11.422 b14 Reusing old log C:\Vs Code Project\Services\Backend\.wwebjs_auth\session\Default\Local Storage\leveldb/000007.log 
+2025/11/27-23:32:11.423 b14 Delete type=2 #5
+2025/11/27-23:32:11.423 b14 Delete type=2 #8
+2025/11/27-23:34:12.060 6d34 Level-0 table #9: started
+2025/11/27-23:34:12.067 6d34 Level-0 table #9: 18792 bytes OK
+2025/11/27-23:34:12.073 6d34 Delete type=0 #7

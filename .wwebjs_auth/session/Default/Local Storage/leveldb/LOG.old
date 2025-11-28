@@ -1,6 +1,3 @@
-2025/11/16-00:45:01.033 2478 Reusing MANIFEST C:\Vs Code Project\Services\Backend\.wwebjs_auth\session\Default\Local Storage\leveldb/MANIFEST-000001
-2025/11/16-00:45:01.090 2478 Recovering log #4
-2025/11/16-00:45:01.092 2478 Reusing old log C:\Vs Code Project\Services\Backend\.wwebjs_auth\session\Default\Local Storage\leveldb/000004.log 
-2025/11/16-01:15:16.415 2758 Level-0 table #8: started
-2025/11/16-01:15:16.424 2758 Level-0 table #8: 18958 bytes OK
-2025/11/16-01:15:16.437 2758 Delete type=0 #4
+2025/11/27-23:30:03.946 593c Reusing MANIFEST C:\Vs Code Project\Services\Backend\.wwebjs_auth\session\Default\Local Storage\leveldb/MANIFEST-000001
+2025/11/27-23:30:04.014 593c Recovering log #7
+2025/11/27-23:30:04.017 593c Reusing old log C:\Vs Code Project\Services\Backend\.wwebjs_auth\session\Default\Local Storage\leveldb/000007.log 
