@@ -1,0 +1,4 @@
+2025/11/29-21:19:39.176 473c Creating DB C:\Vs Code Project\Services\Backend\.wwebjs_auth\session\Default\Service Worker\Database since it was missing.
+2025/11/29-21:19:39.194 473c Reusing MANIFEST C:\Vs Code Project\Services\Backend\.wwebjs_auth\session\Default\Service Worker\Database/MANIFEST-000001
+2025/11/29-21:19:39.217 473c Recovering log #3
+2025/11/29-21:19:39.217 473c Reusing old log C:\Vs Code Project\Services\Backend\.wwebjs_auth\session\Default\Service Worker\Database/000003.log 

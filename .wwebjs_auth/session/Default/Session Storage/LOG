@@ -1,4 +1,4 @@
-2025/11/27-23:32:12.053 b14 Creating DB C:\Vs Code Project\Services\Backend\.wwebjs_auth\session\Default\Session Storage since it was missing.
-2025/11/27-23:32:12.071 b14 Reusing MANIFEST C:\Vs Code Project\Services\Backend\.wwebjs_auth\session\Default\Session Storage/MANIFEST-000001
-2025/11/27-23:32:12.072 b14 Recovering log #3
-2025/11/27-23:32:12.073 b14 Reusing old log C:\Vs Code Project\Services\Backend\.wwebjs_auth\session\Default\Session Storage/000003.log 
+2025/11/29-21:19:37.629 517c Creating DB C:\Vs Code Project\Services\Backend\.wwebjs_auth\session\Default\Session Storage since it was missing.
+2025/11/29-21:19:37.655 517c Reusing MANIFEST C:\Vs Code Project\Services\Backend\.wwebjs_auth\session\Default\Session Storage/MANIFEST-000001
+2025/11/29-21:19:37.668 517c Recovering log #3
+2025/11/29-21:19:37.668 517c Reusing old log C:\Vs Code Project\Services\Backend\.wwebjs_auth\session\Default\Session Storage/000003.log 
