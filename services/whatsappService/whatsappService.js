@@ -2,8 +2,32 @@ import express from "express";
 import pkg from "whatsapp-web.js";
 const { Client, LocalAuth, MessageMedia } = pkg;
 import qrcode from "qrcode-terminal";
+import OpenAI from "openai";
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY,
+});
+const catalog = [
+  { id: 1, name: "Laptop Gamer", price: 3500, desc: "16GB RAM, RTX 3050", img: "https://i.imgur.com/xxxxx.png" },
+  { id: 2, name: "Mouse Inalámbrico", price: 60, desc: "5 botones, RGB", img: "https://i.imgur.com/xxxxx.png" },
+  { id: 3, name: "Auriculares Bluetooth", price: 120, desc: "Cancelación de ruido", img: "https://i.imgur.com/xxxxx.png" }
+];
 
 const router = express.Router();
+const IA_SYSTEM = `
+Eres un agente de ventas profesional. 
+Tu trabajo es ayudar a los clientes a encontrar productos, sugerir opciones, resolver dudas, 
+cerrar ventas y hablar de manera amable, clara y persuasiva.
+Nunca digas que eres una IA.
+Siempre invita a ver productos, explicar beneficios y ofrecer compras.
+Cuando el usuario pida un producto, usa esta base:
+
+CATÁLOGO:
+${catalog.map(p => `ID: ${p.id} - ${p.name} | S/${p.price} | ${p.desc}`).join("\n")}
+
+Si el usuario pregunta algo no relacionado con ventas, responde brevemente y vuelve a ofrecer productos.
+`;
+
+
 
 let qrCodeData = null; // 🧠 Guardamos el último QR generado
 let clientStatus = "Desconectado";
@@ -53,6 +77,25 @@ client.on("disconnected", () => {
     console.error("🧠 Sugerencia: elimina la carpeta '.wwebjs_auth' y vuelve a ejecutar.");
   }
 })();
+
+async function generarRespuestaIA(textoUsuario) {
+  try {
+    const completion = await openai.chat.completions.create({
+      model: "gpt-4o-mini",
+      messages: [
+        { role: "system", content: IA_SYSTEM },
+        { role: "user", content: textoUsuario }
+      ],
+      max_tokens: 250
+    });
+
+    return completion.choices[0].message.content;
+  } catch (error) {
+    console.error("❌ Error en IA:", error);
+    return "Lo siento, hubo un inconveniente procesando tu mensaje. ¿Puedes repetirlo?";
+  }
+}
+
 
 // 📡 0️⃣ Endpoint para ver el QR actual
 router.get("/qr", async (req, res) => {
@@ -335,5 +378,19 @@ router.get("/chats", async (req, res) => {
   }
 });
 
+
+// 🤖 AGENTE DE VENTAS CON IA
+client.on("message", async (msg) => {
+  const text = msg.body.trim();
+  const from = msg.from;
+
+  console.log("📩 Mensaje recibido:", text);
+
+  // IA genera respuesta personalizada
+  const respuesta = await generarRespuestaIA(text);
+
+  // Enviar respuesta al usuario
+  await client.sendMessage(from, respuesta);
+});
 
 export default router;
