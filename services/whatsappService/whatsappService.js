@@ -7,7 +7,7 @@ const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 const catalog = [
-  { id: 1, name: "Laptop Gamer", price: 3500, desc: "16GB RAM, RTX 3050", img: "https://i.imgur.com/xxxxx.png" },
+  { id: 1, name: "Laptop Gamers", price: 3500, desc: "16GB RAM, RTX 3050", img: "https://i.imgur.com/xxxxx.png" },
   { id: 2, name: "Mouse Inalámbrico", price: 60, desc: "5 botones, RGB", img: "https://i.imgur.com/xxxxx.png" },
   { id: 3, name: "Auriculares Bluetooth", price: 120, desc: "Cancelación de ruido", img: "https://i.imgur.com/xxxxx.png" }
 ];
