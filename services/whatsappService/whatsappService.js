@@ -2,32 +2,8 @@ import express from "express";
 import pkg from "whatsapp-web.js";
 const { Client, LocalAuth, MessageMedia } = pkg;
 import qrcode from "qrcode-terminal";
-import OpenAI from "openai";
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
-const catalog = [
-  { id: 1, name: "Laptop Gamers", price: 3500, desc: "16GB RAM, RTX 3050", img: "https://i.imgur.com/xxxxx.png" },
-  { id: 2, name: "Mouse Inalámbrico", price: 60, desc: "5 botones, RGB", img: "https://i.imgur.com/xxxxx.png" },
-  { id: 3, name: "Auriculares Bluetooth", price: 120, desc: "Cancelación de ruido", img: "https://i.imgur.com/xxxxx.png" }
-];
 
 const router = express.Router();
-const IA_SYSTEM = `
-Eres un agente de ventas profesional. 
-Tu trabajo es ayudar a los clientes a encontrar productos, sugerir opciones, resolver dudas, 
-cerrar ventas y hablar de manera amable, clara y persuasiva.
-Nunca digas que eres una IA.
-Siempre invita a ver productos, explicar beneficios y ofrecer compras.
-Cuando el usuario pida un producto, usa esta base:
-
-CATÁLOGO:
-${catalog.map(p => `ID: ${p.id} - ${p.name} | S/${p.price} | ${p.desc}`).join("\n")}
-
-Si el usuario pregunta algo no relacionado con ventas, responde brevemente y vuelve a ofrecer productos.
-`;
-
-
 
 let qrCodeData = null; // 🧠 Guardamos el último QR generado
 let clientStatus = "Desconectado";
@@ -77,25 +53,6 @@ client.on("disconnected", () => {
     console.error("🧠 Sugerencia: elimina la carpeta '.wwebjs_auth' y vuelve a ejecutar.");
   }
 })();
-
-async function generarRespuestaIA(textoUsuario) {
-  try {
-    const completion = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
-      messages: [
-        { role: "system", content: IA_SYSTEM },
-        { role: "user", content: textoUsuario }
-      ],
-      max_tokens: 250
-    });
-
-    return completion.choices[0].message.content;
-  } catch (error) {
-    console.error("❌ Error en IA:", error);
-    return "Lo siento, hubo un inconveniente procesando tu mensaje. ¿Puedes repetirlo?";
-  }
-}
-
 
 // 📡 0️⃣ Endpoint para ver el QR actual
 router.get("/qr", async (req, res) => {
@@ -245,152 +202,5 @@ router.post("/exit", async (req, res) => {
   }
 });
 
-// 🗂️ 7️⃣ Obtener todos los mensajes de un chat
-router.get("/messages/:number", async (req, res) => {
-  const { number } = req.params;
-
-  if (!number) {
-    return res.status(400).json({ error: "Falta el número (number)" });
-  }
-
-  try {
-    const chatId = `${number}@c.us`;
-
-    // 🧩 Obtener el chat
-    const chat = await client.getChatById(chatId);
-
-    if (!chat) {
-      return res.status(404).json({ success: false, message: "Chat no encontrado" });
-    }
-
-    // 📥 Obtener mensajes (puedes aumentar el limit)
-    const messages = await chat.fetchMessages({ limit: 500 });
-
-    // 🧹 Formatear la respuesta
-    const formatted = messages.map((msg) => ({
-      id: msg.id._serialized,
-      fromMe: msg.fromMe,
-      body: msg.body,
-      type: msg.type,
-      timestamp: msg.timestamp,
-      sender: msg._data?.notifyName || msg.author || null,
-    }));
-
-    return res.json({
-      success: true,
-      chat: chatId,
-      total: formatted.length,
-      messages: formatted,
-    });
-  } catch (error) {
-    console.error("❌ Error al obtener mensajes:", error);
-    return res.status(500).json({
-      success: false,
-      message: "No se pudieron obtener los mensajes",
-      error: error.message,
-    });
-  }
-});
-
-// 📨 8️⃣ Obtener solo los mensajes no leídos de un chat
-router.get("/messages/unread/:number", async (req, res) => {
-  const { number } = req.params;
-
-  try {
-    const chatId = `${number}@c.us`;
-    const chat = await client.getChatById(chatId);
-
-    if (!chat) return res.status(404).json({ success: false, message: "Chat no encontrado" });
-
-    const messages = await chat.fetchMessages({ limit: 200 });
-
-    const unread = messages.filter(m => !m.fromMe && m.isUnread);
-
-    return res.json({
-      success: true,
-      total: unread.length,
-      messages: unread.map(msg => ({
-        id: msg.id._serialized,
-        body: msg.body,
-        timestamp: msg.timestamp,
-        from: msg.author || msg.from,
-      })),
-    });
-
-  } catch (error) {
-    console.error("❌ Error al obtener mensajes no leídos:", error);
-    res.status(500).json({ error: error.message });
-  }
-});
-
-// 💬 9️⃣ Obtener el último mensaje de un chat
-router.get("/messages/last/:number", async (req, res) => {
-  const { number } = req.params;
-
-  try {
-    const chatId = `${number}@c.us`;
-    const chat = await client.getChatById(chatId);
-
-    const messages = await chat.fetchMessages({ limit: 1 });
-    const last = messages[0];
-
-    return res.json({
-      success: true,
-      message: {
-        id: last.id._serialized,
-        body: last.body,
-        timestamp: last.timestamp,
-        type: last.type,
-        fromMe: last.fromMe
-      }
-    });
-
-  } catch (error) {
-    console.error("❌ Error en obtener último mensaje:", error);
-    res.status(500).json({ error: error.message });
-  }
-});
-
-
-// 📒 🔟 Obtener todos los chats
-router.get("/chats", async (req, res) => {
-  try {
-    const chats = await client.getChats();
-
-    const formatted = chats.map(chat => ({
-      id: chat.id._serialized,
-      name: chat.name || chat.formattedTitle,
-      isGroup: chat.isGroup,
-      unreadCount: chat.unreadCount,
-      timestamp: chat.timestamp,
-      lastMessage: chat.lastMessage?.body || null
-    }));
-
-    res.json({
-      success: true,
-      total: formatted.length,
-      chats: formatted
-    });
-
-  } catch (error) {
-    console.error("❌ Error al obtener chats:", error);
-    res.status(500).json({ error: error.message });
-  }
-});
-
-
-// 🤖 AGENTE DE VENTAS CON IA
-client.on("message", async (msg) => {
-  const text = msg.body.trim();
-  const from = msg.from;
-
-  console.log("📩 Mensaje recibido:", text);
-
-  // IA genera respuesta personalizada
-  const respuesta = await generarRespuestaIA(text);
-
-  // Enviar respuesta al usuario
-  await client.sendMessage(from, respuesta);
-});
 
 export default router;
